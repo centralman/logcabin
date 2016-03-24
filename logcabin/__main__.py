@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 
-import logcabin
-import sys
-import os
 import json
+import os
+import sys
+
 import gevent
 import gevent.event
 import gevent.monkey
+
+import logcabin
+
 gevent.monkey.patch_all()
 import logging
 import logging.config
@@ -14,6 +17,7 @@ import signal
 import optparse
 from util import ConfigException
 from configuration import PyConfigLoader
+
 
 class LogCabin(object):
     """Main application object"""
@@ -84,7 +88,7 @@ class LogCabin(object):
             self.setup()
         except ConfigException as ex:
             self.logger.error(str(ex))
-            print >>sys.stderr, str(ex)
+            print >> sys.stderr, str(ex)
             return False
 
         self.start()

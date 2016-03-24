@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
-from setuptools import setup, find_packages
 from setuptools import Command
+from setuptools import setup, find_packages
+
 
 class tag(Command):
     """Tag git release."""
@@ -27,14 +28,15 @@ class tag(Command):
         if ret:
             raise SystemExit("git push --tags failed")
 
+
 setup(
     name="logcabin",
     url='http://github.com/artirix/logcabin/',
     version=':versiontools:logcabin:',
     license='Apache 2.0',
     description="Logging framework for receiving and processing events from a "
-    "diverse range of sources and formats, and relaying onto multiple "
-    "destinations.",
+                "diverse range of sources and formats, and relaying onto multiple "
+                "destinations.",
     long_description=file('README.rst').read(),
     author='Barnaby Gray',
     author_email='barnaby@artirix.com',
@@ -54,7 +56,7 @@ setup(
     zip_safe=False,
     entry_points={
         'console_scripts':
-        ['logcabin = logcabin:main']
+            ['logcabin = logcabin:main']
     },
     cmdclass={
         'tag': tag,

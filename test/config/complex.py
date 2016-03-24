@@ -1,8 +1,8 @@
+from filters.json import Json
+from filters.mutate import Mutate
+from filters.regex import Regex
 from flow import Fanin, Fanout, If, Switch
 from inputs.zeromq import Zeromq
-from filters.json import Json
-from filters.regex import Regex
-from filters.mutate import Mutate
 from outputs.log import Log
 
 with Fanin():

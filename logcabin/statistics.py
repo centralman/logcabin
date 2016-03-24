@@ -1,5 +1,6 @@
 import math
 
+
 def mean(li):
     """
     Calculate mean of a list.
@@ -11,6 +12,7 @@ def mean(li):
     if li:
         return sum(li) / len(li)
     return None
+
 
 def percentile(li, pc):
     """
@@ -32,14 +34,15 @@ def percentile(li, pc):
     """
     if not li:
         return None
-    k = (len(li)-1) * pc
+    k = (len(li) - 1) * pc
     f = math.floor(k)
     c = math.ceil(k)
     if f == c:
         return li[int(k)]
-    d0 = li[int(f)] * (c-k)
-    d1 = li[int(c)] * (k-f)
+    d0 = li[int(f)] * (c - k)
+    d1 = li[int(c)] * (k - f)
     return d0 + d1
+
 
 def stddev(li, mean):
     """
@@ -50,4 +53,4 @@ def stddev(li, mean):
     """
     if not li:
         return None
-    return math.sqrt(sum(x*x for x in li) - mean*mean)
+    return math.sqrt(sum(x * x for x in li) - mean * mean)

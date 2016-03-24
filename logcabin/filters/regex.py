@@ -1,7 +1,9 @@
 import re
+
 import dateutil.parser
 
 from .filter import Filter
+
 
 class Regex(Filter):
     """Parse a field with a regular expression. The regex named groups

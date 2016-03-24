@@ -1,5 +1,6 @@
 from .output import Output
 
+
 class Log(Output):
     """Logging output.
 
@@ -9,6 +10,7 @@ class Log(Output):
 
         Log(message="event:")
     """
+
     def __init__(self, message=''):
         super(Log, self).__init__()
         self.message = message

@@ -1,15 +1,18 @@
-import gevent
-import os
+import errno
 import glob
 import logging
-import errno
+import os
 
-from ..event import Event
-from .input import Input
+import gevent
 from gevent.queue import JoinableQueue
+
+from .input import Input
+from ..event import Event
+
 
 class Tail(gevent.Greenlet):
     """Asynchronously tails a file by name, delivering new lines to a queue."""
+
     def __init__(self, path, queue, statedir):
         super(Tail, self).__init__()
         self.logger = logging.getLogger('Tail')
@@ -35,7 +38,7 @@ class Tail(gevent.Greenlet):
         with file(self.offset_path, 'w') as fout:
             offset = self.fin.tell()
             self.logger.debug("Writing state file: %s at offset %d" % (self.offset_path, offset))
-            print >>fout, offset
+            print >> fout, offset
 
     def tail(self):
         self._ensure_open()
@@ -71,11 +74,11 @@ class Tail(gevent.Greenlet):
                 # file has rolled, close and open again
                 self.logger.debug('Detected roll: %s' % self.path)
                 self._ensure_open()
-                st = None # restart
+                st = None  # restart
             elif st and last_st and st.st_size < last_st.st_size:
                 self.logger.debug('Detected truncation: %s' % self.path)
                 self._ensure_open()
-                st = None # restart
+                st = None  # restart
 
             last_st = st
 
@@ -94,6 +97,7 @@ class Tail(gevent.Greenlet):
                     gevent.sleep(0.01)
                     continue
                 raise
+
 
 class File(Input):
     """Tails events from a log file on disk.

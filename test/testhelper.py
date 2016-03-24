@@ -1,6 +1,7 @@
-import tempfile
-import shutil
 import os
+import shutil
+import tempfile
+
 
 def assertEventEquals(self, expected, actual):
     """Compares two events for equality, ignoring the timestamps."""
@@ -10,29 +11,36 @@ def assertEventEquals(self, expected, actual):
     del actual['timestamp']
     self.assertEquals(expected, actual)
 
+
 class Matcher(object):
     """Helper for test assertions"""
+
     def __init__(self, compare):
         self.compare = compare
-        
+
     def __eq__(self, other):
         return self.compare(other)
-    
+
     def __repr__(self):
         return repr(self.compare)
-        
+
+
 def any(_):
     """Matches anything"""
     return True
+
 
 def about(x, p=0):
     fmt = '%%.%df' % p
     return Matcher(lambda t: fmt % x == fmt % t)
 
+
 def between(x, y):
     return Matcher(lambda t: t > x and t < y)
-    
+
+
 ANY = Matcher(any)
+
 
 class TempDirectory(object):
     """Temporary directory with context manager support. Inspired by python 3."""

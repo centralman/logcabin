@@ -1,10 +1,12 @@
-import gevent
-import gevent.socket as socket
 import pickle
 import struct
 import time
 
+import gevent
+import gevent.socket as socket
+
 from .output import Output
+
 
 class Graphite(Output):
     """Upload stats data to a graphite server.
@@ -23,7 +25,7 @@ class Graphite(Output):
         self.port = port
         self._metrics = []
         self._connected = False
-        
+
     def flush(self):
         if not self._connected:
             self.connect()
@@ -53,7 +55,7 @@ class Graphite(Output):
                 gevent.sleep(1.0)
 
         self._connected = True
-        
+
     def process(self, event):
         metric = event.metric
         timestamp = int(time.mktime(event.timestamp.timetuple()))

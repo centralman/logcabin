@@ -1,10 +1,12 @@
-import sys
 import logging
+import sys
 
 from pipeline import Pipeline
 
+
 class ConfigException(Exception):
     pass
+
 
 class PyConfigLoader(object):
     def __init__(self, path):

@@ -1,11 +1,12 @@
-from .filter import Filter
 import logging
 import time
+from pprint import pformat
 
+from .filter import Filter
+from ..event import Event
 from ..statistics import mean, percentile, stddev
 from ..util import Periodic, get_path
-from ..event import Event
-from pprint import pformat
+
 
 class Stats(Filter):
     """Filter that produces aggregate statistics.
@@ -40,6 +41,7 @@ class Stats(Filter):
 
         Stats(metrics={'app.{1}': 'timings.*'})
     """
+
     def __init__(self, period=5, metrics=None, zero=True):
         super(Stats, self).__init__()
         # configuration
@@ -98,6 +100,7 @@ class Stats(Filter):
         if count:
             self.logger.debug('Flushed %d stats' % count)
         self.last = now
+
 
 class Timer(object):
     def __init__(self):

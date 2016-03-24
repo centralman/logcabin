@@ -1,8 +1,8 @@
 # import everything we're using
 from flow import Fanout
 from inputs.zeromq import Zeromq
-from outputs.file import File
 from outputs.elasticsearch import Elasticsearch
+from outputs.file import File
 from outputs.mongodb import Mongodb
 
 # single zeromq input

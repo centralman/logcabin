@@ -1,6 +1,8 @@
-from .output import Output
 import boto
 import boto.s3.key
+
+from .output import Output
+
 
 class S3(Output):
     """Uploads to an S3 bucket.

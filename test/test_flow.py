@@ -1,13 +1,14 @@
 from unittest import TestCase
+
 import gevent
 from gevent.queue import Queue
 
+from logcabin.context import DummyContext
 from logcabin.event import Event
-from logcabin.context import Context, DummyContext
-from logcabin.flow import If, Switch, Sequence
 from logcabin.filters import mutate
-
+from logcabin.flow import If, Switch, Sequence
 from testhelper import assertEventEquals
+
 
 class FlowTests(TestCase):
     def create(self, conf={}, events=[]):
@@ -38,6 +39,7 @@ class FlowTests(TestCase):
         if events:
             return [self.output.get() for n in xrange(events)]
 
+
 class SequenceTests(FlowTests):
     def create_stage(self):
         with Sequence() as test:
@@ -47,9 +49,10 @@ class SequenceTests(FlowTests):
 
     def test_simple(self):
         self.create({},
-            [Event(a=1)])
+                    [Event(a=1)])
         q = self.wait()
         assertEventEquals(self, Event(a=1, b=2), q[0])
+
 
 class SwitchTests(FlowTests):
     def create_stage(self):
@@ -64,27 +67,28 @@ class SwitchTests(FlowTests):
 
     def test_lambda(self):
         self.create({},
-            [Event(a=1)])
+                    [Event(a=1)])
         q = self.wait()
         assertEventEquals(self, Event(a=1, b=1), q[0])
 
     def test_snippet(self):
         self.create({},
-            [Event(a=2)])
+                    [Event(a=2)])
         q = self.wait()
         assertEventEquals(self, Event(a=2, b=2), q[0])
 
     def test_default(self):
         self.create({},
-            [Event(a=3)])
+                    [Event(a=3)])
         q = self.wait()
         assertEventEquals(self, Event(a=3, b=False), q[0])
 
     def test_missing(self):
         self.create({},
-            [Event()])
+                    [Event()])
         q = self.wait()
         assertEventEquals(self, Event(b=False), q[0])
+
 
 class IfTests(FlowTests):
     def create_stage(self):
@@ -95,12 +99,12 @@ class IfTests(FlowTests):
 
     def test_true(self):
         self.create({},
-            [Event(a=1)])
+                    [Event(a=1)])
         q = self.wait()
         assertEventEquals(self, Event(a=1, b=1), q[0])
 
     def test_false(self):
         self.create({},
-            [Event(a=2)])
+                    [Event(a=2)])
         q = self.wait()
         assertEventEquals(self, Event(a=2), q[0])

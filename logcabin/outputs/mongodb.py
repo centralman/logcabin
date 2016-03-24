@@ -1,5 +1,7 @@
-from .output import Output
 import pymongo
+
+from .output import Output
+
 
 class Mongodb(Output):
     """Outputs to a mongodb collection.

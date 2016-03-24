@@ -1,6 +1,8 @@
+import inspect
+
 from common import ProcessingStage, MultiStage
 from util import BroadcastQueue
-import inspect
+
 
 class Fanin(MultiStage):
     """
@@ -17,7 +19,8 @@ class Fanin(MultiStage):
         self.output = q
         for s in self.stages:
             s.setup(self.output)
-        return None # fanin has no inputs
+        return None  # fanin has no inputs
+
 
 class Sequence(MultiStage):
     """
@@ -43,6 +46,7 @@ class Sequence(MultiStage):
         self.input = q
         return self.input
 
+
 class Fanout(MultiStage):
     """
     This enqueues the event onto multiple input queues in parallel.
@@ -64,10 +68,13 @@ class Fanout(MultiStage):
         self.input = BroadcastQueue(queues)
         return self.input
 
+
 from contextlib import contextmanager
+
 
 class DefaultDictProxy(object):
     """Proxies attribute request to dict, missing keys default to None"""
+
     def __init__(self, d):
         self.d = d
 
@@ -80,6 +87,7 @@ class DefaultDictProxy(object):
             return getattr(self.d, k)
         else:
             return self.d.get(k)
+
 
 class Switch(ProcessingStage, MultiStage):
     """Branch flow based on a condition.
@@ -144,6 +152,7 @@ class Switch(ProcessingStage, MultiStage):
 
         # if no condition handles it, pass straight on (True)
         return ret
+
 
 class If(ProcessingStage, MultiStage):
     """

@@ -1,10 +1,13 @@
-from .output import Output
-import os
-import gevent
-import subprocess
 import datetime
+import os
+import subprocess
+
+import gevent
+
+from .output import Output
 from ..event import Event
 from ..util import Periodic
+
 
 class File(Output):
     """Log to file.
@@ -26,6 +29,7 @@ class File(Output):
 
         File(filename='mylogs.log', max_size=10, compress='gz')
     """
+
     def __init__(self, filename, max_size=None, max_count=10, compress=None):
         super(File, self).__init__()
         self.filename = filename
@@ -52,7 +56,7 @@ class File(Output):
         filename = self.filename.format(timestamp=now)
         if self.last_filename and filename != self.last_filename:
             self._rotate(self.last_filename, self.last_event, self.last_event)
-            self.last_filename = filename 
+            self.last_filename = filename
 
     def start(self):
         super(File, self).start()
@@ -83,7 +87,7 @@ class File(Output):
         with file(filename, 'a') as fout:
             d = event.to_json()
             self.logger.debug('Writing to %s: %s' % (filename, d))
-            print >>fout, d
+            print >> fout, d
 
     def _rotate(self, filename, last, trigger):
         if not os.path.exists(filename):
@@ -91,30 +95,30 @@ class File(Output):
 
         suffix = ''
         if self.compress == 'gz':
-            suffix = '.'+self.compress
+            suffix = '.' + self.compress
 
-        roll_first = filename+'.1'+suffix
+        roll_first = filename + '.1' + suffix
         renames = [(filename, roll_first)]
         self.logger.info('Rotating logfile %s to %s' % (filename, roll_first))
         for n, (oldname, newname) in enumerate(renames):
-            if self.max_count and n == self.max_count-1:
+            if self.max_count and n == self.max_count - 1:
                 # cap renamed files if max_count specified
                 break
 
             if os.path.exists(newname):
                 base, num = newname.strip(suffix).rsplit('.', 1)
-                renames.append((newname, '%s.%s%s' % (base, int(num)+1, suffix)))
+                renames.append((newname, '%s.%s%s' % (base, int(num) + 1, suffix)))
 
         if suffix:
             # actually a rename, then compress
-            renames[0] = (filename, filename+'.1')
+            renames[0] = (filename, filename + '.1')
 
         for oldname, newname in reversed(renames):
             self.logger.debug('Renaming logfile %s->%s' % (oldname, newname))
             os.rename(oldname, newname)
 
         if self.compress == 'gz':
-            self._gz(filename+'.1')
+            self._gz(filename + '.1')
 
         # emit 'virtual' event for rolled log file
         self.output.put(Event(tags=['fileroll'], filename=roll_first, last=last or trigger, trigger=trigger))

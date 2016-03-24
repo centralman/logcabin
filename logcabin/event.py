@@ -1,8 +1,10 @@
 import json
-from string import Formatter
 from datetime import datetime
 from pprint import pformat
+from string import Formatter
+
 import dateutil.tz
+
 
 class JSONEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -13,10 +15,11 @@ class JSONEncoder(json.JSONEncoder):
                 obj = obj.astimezone(dateutil.tz.tzutc()).replace(tzinfo=None)
 
             # isoformat doesn't produce consistent output when microsecond=0
-            ms = '.%03dZ' % (obj.microsecond/1000)
+            ms = '.%03dZ' % (obj.microsecond / 1000)
             return obj.strftime("%Y-%m-%dT%H:%M:%S") + ms
         else:
             return super(JSONEncoder, self).default(obj)
+
 
 class DefaultFormatter(Formatter):
     default = ''
@@ -28,11 +31,13 @@ class DefaultFormatter(Formatter):
         except KeyError:
             return self.default
 
+
 class Event(dict):
     """An event.
 
     This is the basic unit of communication in logcabin.
     """
+
     def __init__(self, *args, **kwargs):
         """
         Create an event. A timestamp is automatically generated.

@@ -1,12 +1,12 @@
 # import everything we're using
+from filters.json import Json
+from filters.stats import Stats
 from flow import Fanin, Switch
 from inputs.udp import Udp
 from inputs.zeromq import Zeromq
-from filters.json import Json
-from filters.stats import Stats
-from outputs.graphite import Graphite
 from outputs.elasticsearch import Elasticsearch
 from outputs.file import File
+from outputs.graphite import Graphite
 from outputs.s3 import S3
 
 # input from a couple of sources

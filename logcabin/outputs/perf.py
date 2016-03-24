@@ -1,7 +1,9 @@
 import time
+
 import gevent
 
 from .output import Output
+
 
 class Perf(Output):
     """Simple performance counter output.
@@ -12,6 +14,7 @@ class Perf(Output):
 
         Perf(period=5)
     """
+
     def __init__(self, period=60):
         super(Perf, self).__init__()
         self.period = period
@@ -31,7 +34,7 @@ class Perf(Output):
             now = time.time()
             if self.count > 0:
                 self.logger.info('%d in %ds (%.1f/s)' % (
-                    self.count, now-self.now, self.count/(now-self.now)))
+                    self.count, now - self.now, self.count / (now - self.now)))
             self.now = now
             self.count = 0
 

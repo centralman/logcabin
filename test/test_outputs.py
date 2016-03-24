@@ -1,26 +1,26 @@
-from unittest import TestCase
-import gevent
-from gevent.queue import Queue
-import gevent.server
-import mock
-import json
+import cPickle as pickle
 import gzip
+import json
 import os
 import random
 import struct
 import time
-from datetime import datetime
-import cPickle as pickle
-import zmq.green as zmq
 import urllib2
+from datetime import datetime
+from unittest import TestCase
 
-from logcabin.event import Event
+import gevent
+import gevent.server
+import mock
+import zmq.green as zmq
+from gevent.queue import Queue
+
 from logcabin.context import DummyContext
-
+from logcabin.event import Event
 from logcabin.outputs import elasticsearch, file as fileoutput, graphite, log, \
     mongodb, perf, s3, zeromq
-
 from testhelper import TempDirectory, assertEventEquals, ANY
+
 
 class OutputTests(TestCase):
     def create(self, conf={}):
@@ -39,6 +39,7 @@ class OutputTests(TestCase):
     def tearDown(self):
         self.i.stop()
 
+
 class LogTests(OutputTests):
     cls = log.Log
 
@@ -50,12 +51,14 @@ class LogTests(OutputTests):
 
         self.assertEquals(0, self.input.qsize())
 
+
 class ElasticsearchTests(OutputTests):
     cls = elasticsearch.Elasticsearch
 
     def test_log(self):
         with mock.patch('urllib2.urlopen') as urlopen_mock:
-            urlopen_mock.return_value.read.return_value = json.dumps({'_type': 'event', '_id': 'w0HnGYHFSOS7EBIWnxBcEg', '_version': 1, '_index': 'test'})
+            urlopen_mock.return_value.read.return_value = json.dumps(
+                {'_type': 'event', '_id': 'w0HnGYHFSOS7EBIWnxBcEg', '_version': 1, '_index': 'test'})
             i = self.create({'index': 'test', 'type': 'event'})
 
             self.input.put(Event(field='x'))
@@ -68,6 +71,7 @@ class ElasticsearchTests(OutputTests):
         with mock.patch('urllib2.urlopen') as urlopen_mock:
             def raise_400(url, data):
                 raise urllib2.HTTPError(url, 400, "Bad Request", {}, None)
+
             urlopen_mock.side_effect = raise_400
             i = self.create({'index': 'test', 'type': 'event'})
 
@@ -79,7 +83,8 @@ class ElasticsearchTests(OutputTests):
 
     def test_empty_type(self):
         with mock.patch('urllib2.urlopen') as urlopen_mock:
-            urlopen_mock.return_value.read.return_value = json.dumps({'_type': 'event', '_id': 'w0HnGYHFSOS7EBIWnxBcEg', 'ok': True, '_version': 1, '_index': 'test'})
+            urlopen_mock.return_value.read.return_value = json.dumps(
+                {'_type': 'event', '_id': 'w0HnGYHFSOS7EBIWnxBcEg', 'ok': True, '_version': 1, '_index': 'test'})
             i = self.create({'index': 'test', 'type': ''})
 
             self.input.put(Event(field='x'))
@@ -87,6 +92,7 @@ class ElasticsearchTests(OutputTests):
             i.stop()
 
             self.failIf(urlopen_mock.called)
+
 
 class FileTests(OutputTests):
     cls = fileoutput.File
@@ -108,24 +114,25 @@ class FileTests(OutputTests):
             map(self.input.put, self.events)
             self.waitForEmpty()
 
-            self.assertFileContents(self.events[0].to_json()+'\n', 'log/output_httpd.log')
-            self.assertFileContents(self.events[1].to_json()+'\n', 'log/output_ntpd.log')
+            self.assertFileContents(self.events[0].to_json() + '\n', 'log/output_httpd.log')
+            self.assertFileContents(self.events[1].to_json() + '\n', 'log/output_ntpd.log')
 
     def test_max_size(self):
         with TempDirectory():
             self.create({'filename': 'output.log',
-                'max_size': 16})
+                         'max_size': 16})
 
             map(self.input.put, self.events)
             self.waitForEmpty()
 
-            self.assertFileContents(self.events[0].to_json()+'\n', 'output.log.1')
-            self.assertFileContents(self.events[1].to_json()+'\n', 'output.log')
+            self.assertFileContents(self.events[0].to_json() + '\n', 'output.log.1')
+            self.assertFileContents(self.events[1].to_json() + '\n', 'output.log')
 
             # assert the 'fileroll' event is generated
             self.assert_(self.output.qsize())
             events = [self.output.get() for i in xrange(self.output.qsize())]
-            assertEventEquals(self, Event(tags=['fileroll'], filename='output.log.1', last=self.events[0], trigger=self.events[1]), events[1])
+            assertEventEquals(self, Event(tags=['fileroll'], filename='output.log.1', last=self.events[0],
+                                          trigger=self.events[1]), events[1])
 
     def test_timestamped(self):
         events = [
@@ -136,43 +143,45 @@ class FileTests(OutputTests):
 
         with TempDirectory():
             self.create({'filename': 'output-{timestamp:%Y%m%d}.log',
-                'compress': 'gz'})
+                         'compress': 'gz'})
 
             map(self.input.put, events)
             self.waitForEmpty()
 
-            self.assertFileContents(events[0].to_json()+'\n'+events[1].to_json()+'\n', 'output-20130101.log.1.gz')
-            self.assertFileContents(events[2].to_json()+'\n'+events[3].to_json()+'\n', 'output-20130102.log')
+            self.assertFileContents(events[0].to_json() + '\n' + events[1].to_json() + '\n', 'output-20130101.log.1.gz')
+            self.assertFileContents(events[2].to_json() + '\n' + events[3].to_json() + '\n', 'output-20130102.log')
 
             # assert the 'fileroll' event is generated
-            self.assertEquals(len(events)+1, self.output.qsize())
+            self.assertEquals(len(events) + 1, self.output.qsize())
             outputs = [self.output.get() for i in xrange(self.output.qsize())]
-            assertEventEquals(self, Event(tags=['fileroll'], filename='output-20130101.log.1.gz', last=events[1], trigger=events[2]), outputs[2])
+            assertEventEquals(self, Event(tags=['fileroll'], filename='output-20130101.log.1.gz', last=events[1],
+                                          trigger=events[2]), outputs[2])
 
     def test_compress(self):
         with TempDirectory():
             self.create({'filename': 'output.log',
-                'max_size': 16,
-                'compress': 'gz'})
+                         'max_size': 16,
+                         'compress': 'gz'})
 
             map(self.input.put, self.events)
             self.waitForEmpty()
             self.i.stop()
 
-            self.assertFileContents(self.events[0].to_json()+'\n', 'output.log.1.gz')
-            self.assertFileContents(self.events[1].to_json()+'\n', 'output.log')
+            self.assertFileContents(self.events[0].to_json() + '\n', 'output.log.1.gz')
+            self.assertFileContents(self.events[1].to_json() + '\n', 'output.log')
 
     def test_max_count(self):
         with TempDirectory():
             self.create({'filename': 'output.log',
-                'max_size': 16,
-                'max_count': 2})
+                         'max_size': 16,
+                         'max_count': 2})
 
             map(self.input.put, self.events * 10)
             self.waitForEmpty()
 
-            self.assertFileContents(self.events[1].to_json()+'\n', 'output.log')
+            self.assertFileContents(self.events[1].to_json() + '\n', 'output.log')
             self.assert_(not os.path.exists('output.log.3'))
+
 
 class PerfTests(OutputTests):
     cls = perf.Perf
@@ -185,6 +194,7 @@ class PerfTests(OutputTests):
 
         self.assertEquals(0, self.input.qsize())
 
+
 class MongodbTests(OutputTests):
     cls = mongodb.Mongodb
 
@@ -192,7 +202,7 @@ class MongodbTests(OutputTests):
     def test_log(self, mock_client):
         mock_db = mock_client.return_value.__getitem__ = mock.Mock()
         mock_col = mock_db.return_value.__getitem__ = mock.Mock()
-        mock_col.return_value.insert.return_value = 'abc123' # mock id return
+        mock_col.return_value.insert.return_value = 'abc123'  # mock id return
 
         self.create()
 
@@ -200,6 +210,7 @@ class MongodbTests(OutputTests):
         self.waitForEmpty()
 
         self.assertEquals(0, self.input.qsize())
+
 
 class S3Tests(OutputTests):
     cls = s3.S3
@@ -216,7 +227,7 @@ class S3Tests(OutputTests):
                 fout.write('a log file')
 
             self.create({'access_key': 'dummy', 'secret_key': 'dummy',
-                'bucket': 'bucket1', 'path': 'logs/1.json'})
+                         'bucket': 'bucket1', 'path': 'logs/1.json'})
             self.input.put(Event(tags=['fileroll'], filename='output.log'))
             self.waitForEmpty()
 
@@ -224,6 +235,7 @@ class S3Tests(OutputTests):
         mock_conn.get_bucket.assert_called_with('bucket1')
         mock_bucket.new_key.assert_called_with('logs/1.json')
         mock_key.set_contents_from_filename.assert_called_with('output.log')
+
 
 class GraphiteTests(OutputTests):
     cls = graphite.Graphite
@@ -236,12 +248,13 @@ class GraphiteTests(OutputTests):
 
         port = random.randint(1024, 65535)
         received = []
-        
+
         def handle(socket, address):
             # graphite is a 4-byte length, followed by pickled representation
             length, = struct.unpack('!L', socket.recv(4))
             d = socket.recv(length)
             received.append(pickle.loads(d))
+
         server = gevent.server.StreamServer(('', port), handle)
         server.start()
 
@@ -262,12 +275,13 @@ class GraphiteTests(OutputTests):
     def test_unavailable(self):
         port = random.randint(1024, 65535)
         received = []
-        
+
         def handle(socket, address):
             # graphite is a 4-byte length, followed by pickled representation
             length, = struct.unpack('!L', socket.recv(4))
             d = socket.recv(length)
             received.append(pickle.loads(d))
+
         server = gevent.server.StreamServer(('', port), handle)
 
         self.create({'port': port})
@@ -281,6 +295,7 @@ class GraphiteTests(OutputTests):
         self.i.stop()
         server.stop()
         self.assertEquals(1, len(received))
+
 
 class ZeromqTests(OutputTests):
     cls = zeromq.Zeromq

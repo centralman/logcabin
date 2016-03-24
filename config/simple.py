@@ -1,6 +1,6 @@
 # import the inputs and an output
-from inputs.udp import Udp
 from filters.json import Json
+from inputs.udp import Udp
 from outputs.file import File
 
 Udp(port=6000)

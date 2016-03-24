@@ -1,6 +1,6 @@
 # import the inputs, filters and outputs
-from inputs.file import File as IFile
 from filters.regex import Regex
+from inputs.file import File as IFile
 from outputs.file import File as OFile
 
 # read line by line from input.log

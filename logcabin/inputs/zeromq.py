@@ -1,7 +1,9 @@
-from ..event import Event
-from .input import Input
 import gevent
 import zmq.green as zmq
+
+from .input import Input
+from ..event import Event
+
 
 class Zeromq(Input):
     """Receives from a zeromq socket.
@@ -16,6 +18,7 @@ class Zeromq(Input):
 
         Zeromq(address='tcp://*:2121', mode='bind', socker='PULL')
     """
+
     def __init__(self, address='tcp://*:2120', mode='bind', socket='PULL'):
         if mode not in ('connect', 'bind'):
             raise ValueError('mode should be connect or bind')
@@ -38,7 +41,7 @@ class Zeromq(Input):
                 data = self.sock.recv()
                 self.logger.debug('Received: %r' % data)
                 self.output.put(Event(data=data))
-                gevent.sleep() # yield for other stages
+                gevent.sleep()  # yield for other stages
         finally:
             # cleanup
             self.sock.close()

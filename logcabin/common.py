@@ -1,7 +1,9 @@
 import logging
+
 import gevent
-from gevent.queue import JoinableQueue
 import gevent.monkey
+from gevent.queue import JoinableQueue
+
 gevent.monkey.patch_thread()
 import threading
 from context import Context, ContextManager
@@ -9,6 +11,7 @@ from context import Context, ContextManager
 # Yuck - workaround python 2.7 bug:
 # http://stackoverflow.com/questions/13193278/understand-python-threading-bug
 threading._DummyThread._Thread__stop = lambda x: 42
+
 
 class Stage(object):
     """Base class for all stages.
@@ -81,6 +84,7 @@ class SpawnedStage(Stage):
             self.g.join()
         self.logger.debug('Stopped')
 
+
 class ProcessingStage(SpawnedStage):
     """A spawned stage, that processes events one by one in process()"""
 
@@ -99,6 +103,7 @@ class ProcessingStage(SpawnedStage):
 
     def process(self, event):
         pass
+
 
 class MultiStage(Stage, ContextManager):
     """Base class for stages with children"""

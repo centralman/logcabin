@@ -1,8 +1,10 @@
 # avoid naming ambiguity over stdlib json
 from __future__ import absolute_import
 
-from .filter import Filter
 import json
+
+from .filter import Filter
+
 
 class Json(Filter):
     """Parse a json encoded field.

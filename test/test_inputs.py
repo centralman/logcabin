@@ -1,16 +1,17 @@
+import os
+import random
 from unittest import TestCase
-import zmq.green as zmq
+
 import gevent
 import gevent.socket as socket
+import zmq.green as zmq
 from gevent.queue import Queue
-import random
-import os
 
-from logcabin.event import Event
 from logcabin.context import DummyContext
+from logcabin.event import Event
 from logcabin.inputs import udp, zeromq, file as fileinput
-
 from testhelper import TempDirectory, assertEventEquals
+
 
 class InputTests(TestCase):
     def create(self, conf):
@@ -30,6 +31,7 @@ class InputTests(TestCase):
         if events:
             return [self.output.get() for n in xrange(events)]
 
+
 class ZeromqTests(InputTests):
     cls = zeromq.Zeromq
 
@@ -46,6 +48,7 @@ class ZeromqTests(InputTests):
         q = self.waitForQueue()
         assertEventEquals(self, Event(data='abc'), q[0])
 
+
 class UdpTests(InputTests):
     cls = udp.Udp
 
@@ -60,6 +63,7 @@ class UdpTests(InputTests):
         q = self.waitForQueue()
         assertEventEquals(self, Event(data='abc'), q[0])
 
+
 class FileTests(InputTests):
     cls = fileinput.File
 
@@ -71,9 +75,9 @@ class FileTests(InputTests):
             # create log after a short time
             gevent.sleep(0.01)
             with file('test1.log', 'w') as fin:
-                print >>fin, 'abc'
+                print >> fin, 'abc'
                 gevent.sleep(0.01)
-                print >>fin, 'def'
+                print >> fin, 'def'
 
             q = self.waitForQueue(events=2)
             assertEventEquals(self, Event(data='abc'), q[0])
@@ -82,7 +86,7 @@ class FileTests(InputTests):
     def test_rolling(self):
         with TempDirectory():
             with file('test1.log', 'w') as fin:
-                print >>fin, 'abc'
+                print >> fin, 'abc'
 
             conf = {'path': 'test*.log'}
             self.create(conf)
@@ -90,7 +94,7 @@ class FileTests(InputTests):
             gevent.sleep(0.01)
             os.rename('test1.log', 'test1.log.1')
             with file('test1.log', 'w') as fin:
-                print >>fin, 'def'
+                print >> fin, 'def'
 
             q = self.waitForQueue(events=2)
             assertEventEquals(self, Event(data='abc'), q[0])
@@ -102,9 +106,9 @@ class FileTests(InputTests):
             self.create(conf)
 
             with file('test1.log', 'w') as fin:
-                print >>fin, 'abc'
+                print >> fin, 'abc'
             with file('test2.log', 'w') as fin:
-                print >>fin, 'abc'
+                print >> fin, 'abc'
 
             q = self.waitForQueue(events=2)
             assertEventEquals(self, Event(data='abc'), q[0])
@@ -113,7 +117,7 @@ class FileTests(InputTests):
     def test_resume(self):
         with TempDirectory():
             with file('test1.log', 'w') as fin:
-                print >>fin, 'abc'
+                print >> fin, 'abc'
             conf = {'path': 'test*.log'}
             self.create(conf)
 
@@ -121,7 +125,7 @@ class FileTests(InputTests):
             assertEventEquals(self, Event(data='abc'), q[0])
 
             with file('test1.log', 'a') as fin:
-                print >>fin, 'def'
+                print >> fin, 'def'
 
             self.create(conf)
             q = self.waitForQueue(events=1)
@@ -131,7 +135,7 @@ class FileTests(InputTests):
         with TempDirectory():
             os.mkdir('state')
             with file('test1.log', 'w') as fin:
-                print >>fin, 'abc'
+                print >> fin, 'abc'
             conf = {'path': 'test*.log', 'statedir': 'state'}
             self.create(conf)
 
@@ -139,7 +143,7 @@ class FileTests(InputTests):
             assertEventEquals(self, Event(data='abc'), q[0])
 
             with file('test1.log', 'a') as fin:
-                print >>fin, 'def'
+                print >> fin, 'def'
 
             self.create(conf)
             q = self.waitForQueue(events=1)
@@ -151,11 +155,11 @@ class FileTests(InputTests):
             self.create(conf)
 
             with file('test1.log', 'w') as fin:
-                print >>fin, 'abc'
-                print >>fin, 'def'
+                print >> fin, 'abc'
+                print >> fin, 'def'
             gevent.sleep(0.01)
             with file('test1.log', 'w') as fin:
-                print >>fin, 'ghi'
+                print >> fin, 'ghi'
 
             q = self.waitForQueue(events=3)
             assertEventEquals(self, Event(data='abc'), q[0])

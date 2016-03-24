@@ -2,6 +2,7 @@ import types
 
 from .filter import Filter
 
+
 class Mutate(Filter):
     """Filter that allows you to add, rename, copy and drop fields
 
@@ -21,6 +22,7 @@ class Mutate(Filter):
 
         Mutate(unset=['junk', 'rubbish'])
     """
+
     def __init__(self, set={}, rename={}, copy={}, unset=[]):
         super(Mutate, self).__init__()
         self.sets = set
@@ -31,7 +33,7 @@ class Mutate(Filter):
         assert type(self.copies) == dict
         self.unsets = unset
         assert type(self.unsets) == list
-    
+
     def process(self, event):
         for k, v in self.sets.iteritems():
             if isinstance(v, types.StringTypes):

@@ -1,11 +1,12 @@
+import os
 from unittest import TestCase
 
 from logcabin.configuration import PyConfigLoader, ConfigException
 
-import os
 
 def _p(p):
     return os.path.join(os.path.dirname(__file__), p)
+
 
 class PyConfigLoaderTests(TestCase):
     def test_good(self):

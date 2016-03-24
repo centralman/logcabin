@@ -2,6 +2,7 @@ import urlparse
 
 from .filter import Filter
 
+
 class Url(Filter):
     """Parse a field with a regular expression. The regex named groups
     ``(?P<name>...)`` will be create event fields (overwriting any existing).

@@ -1,5 +1,7 @@
-from .output import Output
 import zmq.green as zmq
+
+from .output import Output
+
 
 class Zeromq(Output):
     """Outputs on a zeromq socket.
@@ -12,6 +14,7 @@ class Zeromq(Output):
 
         Zeromq(address="tcp://relay:2120", mode="connect", socket="PUSH")
     """
+
     def __init__(self, address='tcp://127.0.0.1:2120', mode='connect', socket='PUSH'):
         if mode not in ('connect', 'bind'):
             raise ValueError('mode should be connect or bind')

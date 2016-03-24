@@ -11,8 +11,10 @@ class Context(object):
     def current(cls):
         return cls._stack[-1]
 
+
 # Singleton
 Context.instance = Context()
+
 
 class ContextManager(object):
     def __enter__(self):
@@ -25,6 +27,7 @@ class ContextManager(object):
     def add(self, stage):
         """Override add to handle child adds"""
         pass
+
 
 class DummyContext(ContextManager):
     def __init__(self):

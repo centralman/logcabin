@@ -1,9 +1,12 @@
-from .output import Output
 import gevent
 import gevent.monkey
+
+from .output import Output
+
 gevent.monkey.patch_socket()
 import urllib2
 import json
+
 
 class Elasticsearch(Output):
     """Outputs to an elasticsearch index.

@@ -4,6 +4,7 @@ import sys
 
 __version__ = (1, 0, 10, "final", 0)
 
+
 def main():
     # avoid importing all dependencies when doing 'import logcabin' for
     # __version__
@@ -14,6 +15,7 @@ def main():
         sys.exit(0)
     else:
         sys.exit(1)
+
 
 if __name__ == '__main__':
     main()

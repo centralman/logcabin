@@ -1,5 +1,6 @@
 from .filter import Filter
 
+
 class Python(Filter):
     """Call out to a python function for adding custom functionality.
 
